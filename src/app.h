@@ -112,15 +112,18 @@ public:
         if ( _pasta_mode == list ) {
             fs::path dir( PASTA_GLOBAL_PATH );
             std::string suff( PASTA_GLOBAL_SUFFIX );
+            std::cout << std::endl;
             for ( const auto &entry : fs::directory_iterator( dir ) ) {
                 if ( entry.is_regular_file() && entry.path().extension() == suff ) {
                     std::ifstream file( entry.path() );
                     std::string line;
                     while ( std::getline( file, line ) ) {
-                        std::cout << entry << ": " << line << std::endl;
+                        std::cout << CLR_BLUE << CLR_UNDERLINE << fs::relative( entry ).string() << CLR_RESET << ": "
+                                  << line << std::endl;
                     }
                 }
             }
+            std::cout << std::endl;
 
             return true;
         }
