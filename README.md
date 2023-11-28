@@ -1,5 +1,8 @@
 # copypasta
-An extended Linux terminal copy-paste tool
+#### An extended Linux terminal copy-paste tool
+
+## [NOTICE]
+**Current version does not have complete `build.sh` - does not create global binary!!!**
 
 ### Motivation
 I have always found the `cp` Linux command underwhelming. It has always come far second to the traditional Ctrl+C Ctrl+V GUI approach, thus slowing down my workflow tremendously. The world needs a versatile CLI copy-paste tool, with its own clipboard registers and memory. And thus, the idea for **copypasta** was born.
@@ -18,11 +21,11 @@ cd copypasta;
 3. Run
 - copy
 ```bash
-pasta -c[regs] [files]
+pasta -c[[0..9]] <files>
 ```
 - paste
 ```bash
-pasta -[regs]
+pasta -[[0..9]]
 ```
 - list clipboard registers
 ```bash
