@@ -21,22 +21,21 @@ class app {
     std::vector<std::string> _args;
     std::map<reg, std::string> _reg_pairs;
     std::vector<reg> _regs_active;
-    mode _pasta_mode;
+    pasta::mode _pasta_mode;
+    pasta::error e; // Potential error classs
 
 public:
-    app( int &arg_cnt, char **args ) : _args( arg_cnt ), _reg_pairs(), _pasta_mode( unset ) {
+    app( int &arg_cnt, char **args ) : _args( arg_cnt ), _reg_pairs(), _pasta_mode( unset ), e() {
         for ( int i = 0; i < arg_cnt; i++ )
             _args[i] = args[i];
     }
 
     bool pair_registers() noexcept {
         std::vector<std::string> paths_active;
-        pasta::error e; // Potential error classs
         for ( const auto &argument : _args ) {
-            if ( argument.size() < 2 )
+            if ( argument.size() < 2 || argument == _args[0] )
                 continue;
-            if ( argument == _args[0] )
-                continue;
+            // Argument is -- long word
             if ( argument[0] == ARG_START && argument[1] == ARG_START ) {
                 std::string word_arg = argument.substr( 2 );
                 if ( word_arg == MODE_LIST_VAL )
@@ -45,6 +44,7 @@ public:
                     _pasta_mode = clear;
                 return true;
             }
+            // Argument is - short letter
             if ( argument[0] == ARG_START ) {
                 for ( const auto &c : argument ) {
                     if ( c == argument[0] )
@@ -77,6 +77,10 @@ public:
         }
 
         if ( _pasta_mode == copy ) {
+            if ( !_regs_active.size() ) {
+                e.no_reg();
+                return false;
+            }
             if ( _regs_active.size() != paths_active.size() ) {
                 e.mismatch_arg( _regs_active.size(), paths_active.size() );
                 return false;
@@ -94,8 +98,6 @@ public:
     }
 
     bool run() const noexcept {
-        pasta::error e;
-
         if ( _pasta_mode == clear ) {
             fs::path dir( PASTA_GLOBAL_PATH );
             std::string suff( PASTA_GLOBAL_SUFFIX );
@@ -118,8 +120,8 @@ public:
                     std::ifstream file( entry.path() );
                     std::string line;
                     while ( std::getline( file, line ) ) {
-                        std::cout << CLR_BLUE << CLR_UNDERLINE << fs::relative( entry ).string() << CLR_RESET << ": "
-                                  << line << std::endl;
+                        std::cout << CLR_BLUE << CLR_UNDERLINE << fs::relative( entry ).string()
+                                  << CLR_RESET << ": " << line << std::endl;
                     }
                 }
             }
@@ -136,7 +138,7 @@ public:
                 ss >> reg_num;
                 std::string s = PASTA_GLOBAL_PATH;
                 s += reg_num;
-                s += ".pasta";
+                s += PASTA_GLOBAL_SUFFIX;
                 std::ofstream reg_file( s, std::ios::out );
                 fs::path abs_path( reg_pair.second );
                 reg_file << fs::absolute( abs_path ).c_str();
@@ -151,7 +153,7 @@ public:
             std::string reg_num;
             ss >> reg_num;
             s += reg_num;
-            s += ".pasta";
+            s += PASTA_GLOBAL_SUFFIX;
 
             fs::path reg_path( s );
             if ( !fs::is_regular_file( reg_path ) ) {

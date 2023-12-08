@@ -6,10 +6,8 @@
 int main( int arg_cnt, char **args ) {
 
     pasta::app runtime( arg_cnt, args );
-    if ( !runtime.pair_registers() ) {
+    if ( !runtime.pair_registers() )
         return EXIT_FAILURE;
-    }
-
     runtime.run();
 
     return EXIT_SUCCESS;

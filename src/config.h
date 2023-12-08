@@ -14,8 +14,11 @@
 namespace fs = std::filesystem;
 
 #define ARG_START '-'
-#define PASTA_GLOBAL_PATH "/Users/danvychytil/Code/C:C++/copypasta/"
 #define PASTA_GLOBAL_SUFFIX ".pasta"
+#ifndef PASTA_GLOBAL_PATH
+    #define PASTA_GLOBAL_PATH "~" // Default definition
+#endif
+
 
 // ANSI escape code for text color
 #define CLR_RESET "\033[0m"
